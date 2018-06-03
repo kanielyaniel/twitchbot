@@ -31,9 +31,9 @@ bot.uptime = 0
 
 async def _init_db():
     bot.db = await asyncpg.create_pool(**govinfo)
-    await self.db.execute("CREATE TABLE IF NOT EXISTS guilds (id bigint primary key, prefix text, notifmessage text);")
+    await self.db.execute("CREATE TABLE IF NOT EXISTS guilds (id bigint primary key, notifmessage text);")
 
-self.loop.create_task(_init_db())
+bot.loop.create_task(_init_db())
 
 if __name__ == "__main__":
     for m in modules:
