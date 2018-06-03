@@ -5,6 +5,7 @@ import json
 import os, sys
 import time
 import aiohttp
+import asyncpg
 
 from utils import presence
 from utils import settings
@@ -27,6 +28,12 @@ bot.cmds = 0
 bot.ratelimits = {"twitch": 0, "fortnite": 0, "rocketleague": 0, "pubg": 0}
 bot.vc = {}
 bot.uptime = 0
+
+async def _init_db():
+    bot.db = await asyncpg.create_pool(**govinfo)
+    await self.db.execute("CREATE TABLE IF NOT EXISTS guilds (id bigint primary key, prefix text, notifmessage text);")
+
+self.loop.create_task(_init_db())
 
 if __name__ == "__main__":
     for m in modules:
