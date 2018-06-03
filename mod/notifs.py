@@ -15,7 +15,7 @@ class Notifs:
             await ctx.send("Type `twitch help notif` to view command usage.")
 
     @notif.command(pass_context=True)
-    async def add(self, ctx, discord_channel: discord.TextChannel, *, twitch_users: str):
+    async def add(self, ctx, discord_channel: discord.TextChannel, twitch_user: str, *, message: str):
         """Sets up notifications for a Twitch user in the specified channel."""
         if not ctx.message.author.permissions_in(ctx.message.channel).manage_guild:
             return await ctx.send("You need the **Manage Server** permission to do this.")
@@ -41,6 +41,11 @@ class Notifs:
                         f = open(os.path.join(os.getcwd(), 'data', 'notifs.json'), 'w')
                         f.write(json.dumps(self.bot.notifs))
                         f.close()
+                        guild = await self.bot.db.fetchval("SELECT * FROM guilds WHERE id = $1;", ctx.guild.id)
+                        if guild:
+                            await self.bot.db.execute("UPDATE guilds SET notifmessage = $1 WHERE id = $2;", message, ctx.guild.id)
+                        else:
+                            await self.bot.db.execute("INSERT INTO guilds (id, prefix, notifmessage) VALUES ($1, $2);", ctx.guild.id, message)
                         if len(username) == 1:
                             return await ctx.send("You should now receive a message in {} when `{}` goes live.".format(discord_channel.mention, u))
                 except:
